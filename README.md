@@ -103,7 +103,7 @@ skill-evolver/        进化其他技能的元技能
 
 ## 作者
 
-**离众（Ayin）** —— 浙江大学 2029 届。在学习智能体工程与 OpenCode 的过程中构建。
+**离众（Ayin）** —— 浙江大学 2026 届。在学习智能体工程与 OpenCode 的过程中构建。
 
 *本 README 由 human-writing 技能辅助撰写，并经 skill-evolver 反馈回路修订。*
 
