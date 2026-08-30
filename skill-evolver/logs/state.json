@@ -1,0 +1,14 @@
+{
+  "conversation": {
+    "enabled": true,
+    "initialized": true,
+    "trust_mode": "A",
+    "revision_mode": "D",
+    "show_changes_after_modification": true,
+    "activated_at": "2026-08-27T10:00:00"
+  },
+  "skill_states": {
+    "human-writing": "enabled"
+  },
+  "note": "conversation 字段仅当前对话生效，新对话开始时重置。skill_states 继承 config.json 的 skill_defaults。"
+}
