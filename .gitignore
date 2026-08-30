@@ -7,3 +7,10 @@ skill-evolver/logs/execution-log.md
 skill-evolver/logs/backups/
 
 # personal drafts (private)
+
+# secrets — never commit credentials
+opencode.json
+*.pem
+*_apikey*
+*.key
+.env
