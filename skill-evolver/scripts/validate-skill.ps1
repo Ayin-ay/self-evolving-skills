@@ -1,4 +1,4 @@
-﻿param(
+param(
     [Parameter(Mandatory=$true)]
     [string]$SkillPath
 )
@@ -6,7 +6,7 @@
 $ErrorActionPreference = "Stop"
 
 if (-not (Test-Path -LiteralPath $SkillPath)) {
-    Write-Error "路径不存在: $SkillPath"
+    Write-Error "path not found: $SkillPath"
     exit 1
 }
 
@@ -19,7 +19,7 @@ if ((Get-Item -LiteralPath $SkillPath).PSIsContainer) {
 }
 
 if (-not (Test-Path -LiteralPath $SkillFile)) {
-    Write-Error "SKILL.md 不存在: $SkillFile"
+    Write-Error "SKILL.md not found: $SkillFile"
     exit 1
 }
 
@@ -27,23 +27,23 @@ $errors = @()
 $warnings = @()
 
 # 1. YAML frontmatter
-$content = Get-Content -LiteralPath $SkillFile -Raw
-if ($content -notmatch '^---\s*\n(.*?)\n---') {
-    $errors += "YAML frontmatter 缺失或格式错误"
+$content = Get-Content -LiteralPath $SkillFile -Raw -Encoding UTF8
+if ($content -notmatch '(?s)^---\s*\r?\n(.*?)\r?\n---') {
+    $errors += "YAML frontmatter missing or malformed"
 } else {
     $yamlBlock = $matches[1]
     if ($yamlBlock -notmatch '(?m)^name:\s*\S') {
-        $errors += "name 字段缺失或为空"
+        $errors += "name field missing or empty"
     }
     if ($yamlBlock -notmatch '(?m)^description:\s*\S') {
-        $errors += "description 字段缺失或为空"
+        $errors += "description field missing or empty"
     }
 }
 
 # 2. Markdown code blocks
 $fenceCount = [regex]::Matches($content, '```').Count
 if ($fenceCount % 2 -ne 0) {
-    $errors += "代码块未正确闭合 (``` 数量为奇数: $fenceCount)"
+    $errors += "code block not closed (odd fence count: $fenceCount)"
 }
 
 # 3. Check for duplicate content within the file
@@ -77,7 +77,7 @@ foreach ($para in $paragraphs) {
     }
 }
 if ($duplicates.Count -gt 0) {
-    $warnings += "检测到重复段落: $($duplicates.Count) 处"
+    $warnings += "duplicate paragraphs found: $($duplicates.Count)"
 }
 
 # 4. Check heading levels
@@ -92,7 +92,7 @@ foreach ($h in $headings) {
     $lastLevel = $level
 }
 if ($skipLevels) {
-    $warnings += "标题层级跳级（如从 ## 直接到 ####）"
+    $warnings += "heading level skipped (e.g. ## then ####)"
 }
 
 # 5. Check table formatting
@@ -106,7 +106,7 @@ if ($tableRows.Count -gt 0) {
         }
     }
     if (-not $hasSeparator) {
-        $warnings += "表格缺少分隔行"
+        $warnings += "table separator row missing"
     }
 }
 
@@ -117,7 +117,7 @@ if (Test-Path -LiteralPath $refDir) {
     foreach ($m in $refMatches) {
         $refPath = Join-Path -Path $SkillDir -ChildPath $m.Value
         if (-not (Test-Path -LiteralPath $refPath)) {
-            $errors += "引用文件不存在: $($m.Value)"
+            $errors += "referenced file not found: $($m.Value)"
         }
     }
 }
@@ -127,27 +127,27 @@ $scriptMatches = [regex]::Matches($content, 'scripts/[\w.-]+\.\w+')
 foreach ($m in $scriptMatches) {
     $scriptPath = Join-Path -Path $SkillDir -ChildPath $m.Value
     if (-not (Test-Path -LiteralPath $scriptPath)) {
-        $warnings += "脚本文件不存在: $($m.Value)"
+        $warnings += "script file not found: $($m.Value)"
     }
 }
 
 # Output
 $valid = ($errors.Count -eq 0)
 
-Write-Host "## 验证结果: $($SkillFile)"
-Write-Host "**状态**: $(if ($valid) { '通过' } else { '失败' })"
-Write-Host "**错误数**: $($errors.Count) | **警告数**: $($warnings.Count)"
+Write-Host "## Validation result: $($SkillFile)"
+Write-Host "**Status**: $(if ($valid) { 'pass' } else { 'fail' })"
+Write-Host "**Errors**: $($errors.Count) | **Warnings**: $($warnings.Count)"
 Write-Host ""
 
 if ($errors.Count -gt 0) {
-    Write-Host "### 错误"
+    Write-Host "### Errors"
     foreach ($e in $errors) {
         Write-Host "- [ERROR] $e"
     }
     Write-Host ""
 }
 if ($warnings.Count -gt 0) {
-    Write-Host "### 警告"
+    Write-Host "### Warnings"
     foreach ($w in $warnings) {
         Write-Host "- [WARNING] $w"
     }
