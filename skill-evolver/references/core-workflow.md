@@ -27,4 +27,4 @@
 读取目标 → 备份到 `logs\backups\`（硬性门槛：未备份不得修改）→ 修改 → 更新变更日志（记录前查重，不得产生重复条目）→ 验证。
 
 ## Step 7: 验证更新
-运行 `scripts\validate-skill.ps1` 做格式与去重检查，再做链接检查、完整性检查、回归检查。失败则回滚（从 `logs\backups\` 恢复）。
+运行 `scripts\validate-skill.ps1` 做格式与去重检查，再做链接检查、完整性检查、回归检查（脚本为 Windows PowerShell 编写；macOS/Linux 环境跳过脚本，按 SKILL.md 与 audit-criteria.md 的检查清单人工核验）。失败则回滚（从 `logs\backups\` 恢复）。

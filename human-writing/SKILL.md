@@ -202,7 +202,7 @@ description: 通用中文创作与改稿 Skill。用于知乎回答、论坛长�
 
 ## 稿件管理
 
-稿件统一存储在 `D:\文档\human-writing-drafts\` 目录下。该目录已在 Skill 首次激活时创建，后续不再重复创建。
+稿件统一存储在 `human-writing-drafts` 目录下。目录按以下顺序定位：用户指定目录 > `D:\文档\human-writing-drafts\`（若存在）> 用户主目录下的 `human-writing-drafts\`（首次使用时创建，之后不再重复创建）。
 
 ### 首次生成
 
@@ -220,5 +220,5 @@ description: 通用中文创作与改稿 Skill。用于知乎回答、论坛长�
 
 ### 读取
 
-- 需要读取历史稿件时，从 `D:\文档\human-writing-drafts\` 目录下查找。
+- 需要读取历史稿件时，按上述目录定位规则查找。
 - 读取时优先读取最新版次。

@@ -132,3 +132,8 @@
 - 修改内容: 1) 硬编码路径改为 PSScriptRoot 相对定位，任何机器可运行；2) 修复 Join-Path 双 -Path 参数笔误（ParameterAlreadyBound 根因）；3) 修复 Windows 换行符不兼容的 frontmatter 正则并显式 UTF-8 读取；4) 全部输出改纯 ASCII 根除 PS 5.1 中文编码问题
 - 影响范围: 检查技能库指令的底层脚本
 - 更新人: skill-evolver
+### 更新: skill-evolver/human-writing - Claude Code 兼容性修复
+- 原因: 用户同学反馈项目与 Claude Code 不兼容；排查发现安装位置未说明、稿件目录硬编码私人路径、脚本平台绑定三类问题
+- 修改内容: README 中英双语新增 Installation 章节（OpenCode 与 Claude Code 双平台路径）；human-writing SKILL.md 稿件目录改为三级定位规则（用户指定 > 作者原路径 > 用户主目录）；core-workflow.md Step 7 补充 macOS/Linux 跳过 ps1 脚本的人工核验路径
+- 影响范围: 新用户安装体验、跨平台可用性
+- 更新人: skill-evolver

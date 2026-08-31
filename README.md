@@ -91,6 +91,20 @@ skill-evolver/        进化其他技能的元技能
 └── logs/             evolution-log.md — 完整迭代历史
 ```
 
+## 安装
+
+**OpenCode**（Windows/macOS/Linux）
+把 `human-writing/` 和 `skill-evolver/` 两个文件夹复制到 skills 目录：
+- Windows `C:\Users\<用户名>\.config\opencode\skills\`
+- macOS/Linux `~/.config/opencode/skills/`
+
+**Claude Code**
+本项目的 SKILL.md 与 Claude Code Agent Skills 格式兼容，把同样的两个文件夹复制到：
+- Windows `C:\Users\<用户名>\.claude\skills\`
+- macOS/Linux `~/.claude/skills/`
+
+跨平台说明：`check_prose.py` 需要本机装有 Python 3；两个 `.ps1` 脚本仅支持 Windows PowerShell，macOS/Linux 下跳过脚本验证，按 SKILL.md 内的检查清单人工执行。`agents/openai.yaml` 是 OpenCode 专属配置，Claude Code 会忽略它，不影响使用。
+
 ## 进化历史
 
 截至写作时共记录 17 次迭代，包括：诗歌格式强制化、风格模仿的借用边界、自动模式触发重设计（命令级而非会话级）、上下文清空硬约束、覆盖体验/质量/性能三端的 11 项自检。`skill-evolver/logs/evolution-log.md` 的每一条都记录了原因、修改内容和影响范围。
@@ -196,6 +210,20 @@ skill-evolver/        the meta skill that evolves the others
 ├── scripts/          validate-skill.ps1, audit-skill.ps1 (PowerShell)
 └── logs/             evolution-log.md — full iteration history
 ```
+
+## Installation
+
+**OpenCode** (Windows/macOS/Linux)
+Copy the `human-writing/` and `skill-evolver/` folders into the skills directory:
+- Windows `C:\Users\<you>\.config\opencode\skills\`
+- macOS/Linux `~/.config/opencode/skills/`
+
+**Claude Code**
+The SKILL.md format is compatible with Claude Code Agent Skills. Copy the same two folders into:
+- Windows `C:\Users\<you>\.claude\skills\`
+- macOS/Linux `~/.claude/skills/`
+
+Cross-platform notes: `check_prose.py` requires Python 3; the two `.ps1` scripts are Windows PowerShell only — on macOS/Linux skip them and follow the manual checklists inside SKILL.md. `agents/openai.yaml` is an OpenCode-specific extra; Claude Code simply ignores it.
 
 ## Evolution History
 
