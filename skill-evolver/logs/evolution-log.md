@@ -127,3 +127,8 @@
 - 原因: 用户指出该句式属于翻案腔变体
 - 修改内容: forum-prose.md 禁止预期反转句式章节补充该句式
 - 影响范围: 所有稿件生成场景
+### 更新: skill-evolver - audit-skill.ps1 修复三重损坏并首次成功运行
+- 原因: 用户同学指出硬编码私人路径（C:\\Users\\离众\\...）；修复过程中发现脚本自创建以来从未成功运行过
+- 修改内容: 1) 硬编码路径改为 PSScriptRoot 相对定位，任何机器可运行；2) 修复 Join-Path 双 -Path 参数笔误（ParameterAlreadyBound 根因）；3) 修复 Windows 换行符不兼容的 frontmatter 正则并显式 UTF-8 读取；4) 全部输出改纯 ASCII 根除 PS 5.1 中文编码问题
+- 影响范围: 检查技能库指令的底层脚本
+- 更新人: skill-evolver

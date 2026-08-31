@@ -8,7 +8,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$SkillsRoot = "C:\Users\离众\.config\opencode\skills"
+# locate skills root relative to this script, no hardcoded user paths
+$SkillsRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $LogDir = Join-Path -Path $SkillsRoot -ChildPath "skill-evolver\logs"
 $AuditLog = Join-Path -Path $LogDir -ChildPath "audit-report-latest.md"
 
@@ -18,10 +19,10 @@ if (-not (Test-Path -LiteralPath $LogDir)) {
 
 function Get-AllSkills {
     $skills = @()
-    Get-ChildItem -LiteralPath $SkillsRoot -Directory | ForEach-Object {
-        $skillDir = $_.FullName
-        $skillName = $_.Name
-        $skillFile = Join-Path -Path $skillDir -Path "SKILL.md"
+    foreach ($dir in @(Get-ChildItem -LiteralPath $SkillsRoot -Directory)) {
+        $skillDir = $dir.FullName
+        $skillName = $dir.Name
+        $skillFile = Join-Path -Path $skillDir -ChildPath "SKILL.md"
         if (Test-Path -LiteralPath $skillFile) {
             $skills += @{
                 Name = $skillName
@@ -35,16 +36,16 @@ function Get-AllSkills {
 
 function Check-YamlFrontmatter {
     param([string]$FilePath)
-    $content = Get-Content -LiteralPath $FilePath -Raw
-    if ($content -notmatch '^---\s*\n(.*?)\n---') {
-        return $false, "YAML frontmatter 缺失或格式错误"
+    $content = Get-Content -LiteralPath $FilePath -Raw -Encoding UTF8
+    if ($content -notmatch '(?s)^---\s*\r?\n(.*?)\r?\n---') {
+        return $false, "YAML frontmatter missing or malformed"
     }
     $yamlBlock = $matches[1]
     if ($yamlBlock -notmatch '(?m)^name:\s*\S') {
-        return $false, "name 字段缺失或为空"
+        return $false, "name field missing or empty"
     }
     if ($yamlBlock -notmatch '(?m)^description:\s*\S') {
-        return $false, "description 字段缺失或为空"
+        return $false, "description field missing or empty"
     }
     return $true, ""
 }
@@ -57,7 +58,7 @@ function Check-LineCount {
 
 function Check-CodeBlocks {
     param([string]$FilePath)
-    $content = Get-Content -LiteralPath $FilePath -Raw
+    $content = Get-Content -LiteralPath $FilePath -Raw -Encoding UTF8
     $fenceCount = [regex]::Matches($content, '```').Count
     return ($fenceCount % 2) -eq 0
 }
@@ -73,7 +74,7 @@ function Check-References {
         if (-not (Test-Path -LiteralPath $refPath)) {
             $issues += @{
                 Type = "Error"
-                Desc = "引用文件不存在: $($m.Value)"
+                Desc = "referenced file not found: $($m.Value)"
             }
         }
     }
@@ -89,7 +90,7 @@ function Check-Scripts {
     foreach ($m in $matches) {
         $scriptPath = Join-Path -Path $SkillDir -ChildPath $m.Value
         if (-not (Test-Path -LiteralPath $scriptPath)) {
-            $issues += @{ Type = "Error"; Desc = "脚本文件不存在: $($m.Value)" }
+            $issues += @{ Type = "Error"; Desc = "script file not found: $($m.Value)" }
         }
     }
     return $issues
@@ -101,7 +102,7 @@ function Check-EmptyRefs {
     if (Test-Path -LiteralPath $refDir) {
         $items = Get-ChildItem -LiteralPath $refDir
         if ($items.Count -eq 0) {
-            return @(@{ Type = "Warning"; Desc = "references/ 目录为空" })
+            return @(@{ Type = "Warning"; Desc = "references/ directory is empty" })
         }
     }
     return @()
@@ -110,12 +111,12 @@ function Check-EmptyRefs {
 function Write-AuditReport {
     param([array]$AllIssues, [int]$SkillCount)
     $reportLines = @()
-    $reportLines += "# 技能库审计报告"
+    $reportLines += "# Skills Audit Report"
     $reportLines += ""
-    $reportLines += "**扫描时间**: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
-    $reportLines += "**扫描模式**: $Mode"
-    $reportLines += "**覆盖 Skill 数**: $SkillCount"
-    $reportLines += "**发现问题数**: $($AllIssues.Count)"
+    $reportLines += "**Scan time**: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+    $reportLines += "**Scan mode**: $Mode"
+    $reportLines += "**Skills covered**: $SkillCount"
+    $reportLines += "**Issues found**: $($AllIssues.Count)"
     $reportLines += ""
 
     $blockers = $AllIssues | Where-Object { $_.Severity -eq "Blocker" }
@@ -123,21 +124,21 @@ function Write-AuditReport {
     $warnings = $AllIssues | Where-Object { $_.Severity -eq "Warning" }
 
     if ($blockers.Count -gt 0) {
-        $reportLines += "## 严重问题 (Blocker)"
+        $reportLines += "## Blockers"
         foreach ($issue in $blockers) {
             $reportLines += "- [$($issue.Skill)] $($issue.Desc)"
         }
         $reportLines += ""
     }
     if ($errors.Count -gt 0) {
-        $reportLines += "## 错误 (Error)"
+        $reportLines += "## Errors"
         foreach ($issue in $errors) {
             $reportLines += "- [$($issue.Skill)] $($issue.Desc)"
         }
         $reportLines += ""
     }
     if ($warnings.Count -gt 0) {
-        $reportLines += "## 警告 (Warning)"
+        $reportLines += "## Warnings"
         foreach ($issue in $warnings) {
             $reportLines += "- [$($issue.Skill)] $($issue.Desc)"
         }
@@ -146,7 +147,7 @@ function Write-AuditReport {
 
     $reportContent = $reportLines -join "`n"
     Set-Content -LiteralPath $AuditLog -Value $reportContent -Encoding UTF8
-    Write-Host "审计报告已保存至: $AuditLog"
+    Write-Host "audit report saved to: $AuditLog"
     Write-Host $reportContent
 }
 
@@ -155,7 +156,7 @@ $skills = Get-AllSkills
 if ($TargetSkill -ne "") {
     $skills = $skills | Where-Object { $_.Name -eq $TargetSkill }
     if ($skills.Count -eq 0) {
-        Write-Error "未找到名为 $TargetSkill 的 Skill"
+        Write-Error "skill not found: $TargetSkill"
         exit 1
     }
 }
@@ -168,7 +169,7 @@ foreach ($skill in $skills) {
 
     # Check existence
     if (-not (Test-Path -LiteralPath $skillFile)) {
-        $allIssues += @{ Skill = $skillName; Severity = "Blocker"; Desc = "SKILL.md 文件不存在" }
+        $allIssues += @{ Skill = $skillName; Severity = "Blocker"; Desc = "SKILL.md file not found" }
         continue
     }
 
@@ -180,12 +181,12 @@ foreach ($skill in $skills) {
 
     # Check code blocks
     if (-not (Check-CodeBlocks -FilePath $skillFile)) {
-        $allIssues += @{ Skill = $skillName; Severity = "Error"; Desc = "代码块未正确闭合" }
+        $allIssues += @{ Skill = $skillName; Severity = "Error"; Desc = "code block not closed properly" }
     }
 
     if ($Mode -eq "deep") {
         if (-not (Check-LineCount -FilePath $skillFile)) {
-            $allIssues += @{ Skill = $skillName; Severity = "Warning"; Desc = "正文少于 50 行，内容薄弱" }
+            $allIssues += @{ Skill = $skillName; Severity = "Warning"; Desc = "main body under 50 lines, thin content" }
         }
         $refIssues = Check-References -SkillDir $skillDir -SkillFile $skillFile
         foreach ($ri in $refIssues) {
