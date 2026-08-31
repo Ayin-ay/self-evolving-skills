@@ -137,3 +137,8 @@
 - 修改内容: README 中英双语新增 Installation 章节（OpenCode 与 Claude Code 双平台路径）；human-writing SKILL.md 稿件目录改为三级定位规则（用户指定 > 作者原路径 > 用户主目录）；core-workflow.md Step 7 补充 macOS/Linux 跳过 ps1 脚本的人工核验路径
 - 影响范围: 新用户安装体验、跨平台可用性
 - 更新人: skill-evolver
+### 更新: human-writing - 引用外部文档先核对存在
+- 原因: 宣传文案声称「安装路径见 README」而 README 当时并无安装章节，属于稿件对外部文档的虚构描述；Claude Code 兼容性修复时暴露
+- 修改内容: reality.md 新增「引用外部文档先核对存在」小节，要求交稿前将稿件中所有指向外部文档的表述与实物逐条比对
+- 影响范围: 宣传稿、教程稿等引用外部材料的写作场景
+- 更新人: skill-evolver
